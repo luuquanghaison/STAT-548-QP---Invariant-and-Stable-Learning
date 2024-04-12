@@ -1,0 +1,143 @@
+% !TEX root = ../main.tex
+
+% Project report section
+
+\section{Project report}
+For this mini-project, we shall focus on proposal 1.
+\subsection{Set up}
+Consider a smooth connected compact boundaryless $dim(\calM)$-dimensional (Riemannian) manifold $\calM$ equipped with the Riemannian metric. Let $G$ denote a symmetric Borel set of diffeomorphisms $\sigma: \calM \to \calM$ and assume there exists a compact Lie group $\langle G \rangle$ (i.e., a group with a smooth manifold structure) containing $G$. Further assume that $\langle G \rangle$ is a subgroup of the isometry group $ISO(\calM)$.\\
+Let the notations and assumptions on the data be the same as Section \ref{section1}, i.e. the data are pairs of input-label $(x_i,y_i)^n_{i=1}$ satisfying
+\begin{align}
+\begin{alignedat}{3}
+\forall\ i\in \{1,\ldots,n\}:
+\begin{cases}
+&x_i\in \calM, y_i\in \bbR\\
+&(x_i,y_i)\sim \rho\\
+&E(y_i|x_i) = f^*(x_i),\ f^*:\calM\to \bbR,\ f^*\in L^2(\calM)\\
+&E((f^*(x_i)-y_i)^2|x_i)\le \sigma_\rho
+\end{cases}
+\end{alignedat}
+\end{align}
+where $f^*$ is the target function, $L^2(\calM)$ is the space of square-integrable real-valued functions on $\calM$ and $\rho$ is a distribution with the marginal for the input component being the uniform distribution on $\calM$. Now denote $K$ and $\calH_K$ a continuous positive-definite symmetric dot-product kernel on $\calM\times\calM$ and its corresponding reproducible kernel Hilbert space (RKHS). Next define the smoothing operators $S_G$ and $S_{\langle G \rangle}$ as follows:
+\begin{align}
+    S_Gf &:= \int_G \sigma f d\mu_G(\sigma) \label{S_G}\\
+    S_{\langle G \rangle}f &:= \int_{\langle G \rangle} \sigma f d\mu_G(\sigma)
+\end{align}
+where $\mu_G(\sigma)$ is the left-invariant Haar (uniform) measure of $\langle G \rangle$ and
+\begin{align}
+\begin{alignedat}{3}
+    \sigma f := \begin{cases}
+        f(\sigma(\cdot))\quad \text{if }f:\calM\to\bbR\\
+        f(\sigma(\cdot),\cdot)\quad \text{if }f:\calM\times\calM\to\bbR
+    \end{cases}.
+\end{alignedat}
+\end{align}
+We again consider the kernel ridge regression (KRR) problem with $K_G:=S_GK$ where the goal is to estimate
+\begin{align}
+    \hat{f}_\lambda := \arg\min_{f\in \calH_{K_G}}\frac{1}{n}\sum_{i=1}^n(f(x_i)-y_i)^2 + \lambda\|f\|_{\calH_{K_G}}^2
+\end{align}
+For this mini-project, we will focus on geometrically stable target functions, i.e. functions $f^*$ satisfying the source condition
+\begin{align}\label{source}
+    \exists\ r\ge 1/2, g\in L^2, \|g\|_{L^2}\le C_{f^*}:f^*= T^r_{K_G}g
+\end{align}
+where $T_{K_G}$ has the same definition as in Section \ref{section1} but with the measure used in the integration is changed to the Riemannian metric.
+
+\subsection{Result}
+With the above set up, we have the following generalization bound on the excess risk 
+\begin{theorem}\label{theo_bound}
+    Assume the source condition in \eqref{source}. Consider KRR the Sobolev space $\calH_s(\calM), s > d/2$, with $d = dim(\calM/\langle G \rangle)$. Then
+    \begin{align}
+        E[\calR(\hat{f}_\lambda)]-\calR(f^*)\le
+        32\left(\frac{d\sigma^2_\rho}{4r(2s-d)n}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)^{2rs/(2rs+d/2)}\|g\|_{L^2}^{d/(2rs+d/2)} + o\left(n^{-2rs/(2rs+d/2)}\right).
+    \end{align}
+    Here the optimal regularization parameter is
+    \begin{align}
+         \lambda = \left(\frac{d\sigma^2_\rho}{4r\|g\|_{L^2}^2(2s-d)n}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)^{s/(2rs+d/2)},
+    \end{align}
+    $\omega_d$ is the volume of the unit sphere in $\bbR^d$ and $vol(\calM/\langle G\rangle)$ is the volume of the quotient space $\calM/\langle G\rangle$.
+\end{theorem}
+The first step to prove Theorem \ref{theo_bound} is to use the following initial bound found in Proposition 7.3 of \cite{bach2021learning}:
+\begin{align}\label{init_bound}
+    E[\calR(\hat{f}_\lambda)]-\calR(f^*)\le 16\frac{\sigma^2}{n}\calN_{K_G}(\lambda) + 16\calA(\lambda,f^*) + \frac{24}{n^2}\|f^*\|_{L^\infty}
+\end{align}
+where the approximation error $\calA(\lambda,f^*)$ and degrees of freedom $\calN_{K_G}(\lambda)$ have the same definitions as in Section \ref{section1}.
+
+\subsubsection{Bound on the approximation error}
+Using the arguments from \cite{bietti2021sample}, we have
+\begin{align}
+    \calA(\lambda,f^*)&\le \lambda^{2r}\|T_{K_G}^{-r}f^*\|_{L^2} &\text{(Theorem 3 from \cite{cucker2002mathematical})}\\
+    &=\lambda^{2r}\|T_{K_G}^{-r}S_G^rT_{K_G}^{r}g\|_{L^2}^2 &\text{(source condition)}\\
+    &=\lambda^{2r}\|T_{K_G}^{-r}T_{K_G}^{r}S_G^rg\|_{L^2}^2 &\text{($S_G$ and $T_{K_G}$ commute)}\\
+    &=\lambda^{2r}\|S_G^rg\|_{L^2}^2\\
+    &\le \lambda^{2r}\|S_G^r\|^2\|g\|_{L^2}^2\\
+    &\le \lambda^{2r}\|S_G\|^{2r}\|g\|_{L^2}^2\le \lambda^{2r}\|g\|_{L^2}^2 &(\|S_G\|\le 1).
+\end{align}
+
+
+\subsubsection{Bound on dimension of function spaces}
+We have the following theorem regarding the eigenvalues of $K_G$ and $K_{\langle G\rangle}:=S_{\langle G\rangle}K$
+\begin{theorem}\label{theoN}
+    For all $l$, we have $\lambda^{K_G}_l\le \lambda^{K_{\langle G\rangle}}_l$ where $\lambda^{K}_l$ denote the $l^{th}$ smallest eigenvalue of a positive definite kernel $K$.
+\end{theorem}
+\begin{proof}
+    First, we prove that the set $\langle G\rangle \backslash G$ is also symmetric. To see this, assume that there exists $\sigma\in \langle G\rangle \backslash G$ such that $\sigma^{-1}\notin \langle G\rangle \backslash G$. This means $\sigma^{-1}\in G$ but since $G$ is symmetric, we have $\sigma\in G$, which contradicts the assumption that $\sigma\in \langle G\rangle \backslash G$. Therefore, $\langle G\rangle \backslash G$ is symmetric. This means $K_{\langle G\rangle \backslash G}:=S_{\langle G\rangle \backslash G}K$ defines a positive definite kernel and
+    \begin{align}
+        K_{\langle G\rangle} = K_{G} + K_{\langle G\rangle \backslash G}
+    \end{align}
+    Now using Corollary 4.11 in \cite{teschl2014mathematical} gives us
+    \begin{align}
+        \lambda^{K_G}_l \le \lambda^{K_{\langle G\rangle}}_l\quad\forall\ l.
+    \end{align}
+\end{proof}
+
+\subsubsection{Bound on the degrees of freedom}
+Using Theorem \ref{theoN} and the definition of $\calN_{K_G}(\lambda)$, we have
+\begin{align}
+    \calN_{K_G}(\lambda) = \sum_{l\ge 0}\frac{\lambda_l^{K_G}}{\lambda_l^{K_G}+\lambda}
+    \le \sum_{l\ge 0}\frac{\lambda_l^{K_{\langle G\rangle}}}{\lambda_l^{K_{\langle G\rangle}}+\lambda}=\calN_{K_{\langle G\rangle}}(\lambda).
+\end{align}
+Next, following the derivation from \cite{tahmasebi2023exact} for $K_{\langle G\rangle}$, we have
+\begin{align}
+\begin{alignedat}{3}
+    \calN_{K_{\langle G\rangle}}(\lambda)
+    &\le \lambda \left(\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle) + C_{\calM/\langle G\rangle}\right) \\
+    &+ \frac{s}{2s-d}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\lambda^{1-\frac{1}{s}(s+d/2)}\\
+    &+\frac{s}{2s-d+1}C_{\calM/\langle G\rangle}\lambda^{1-\frac{1}{s}(s+(d-1)/2)}.
+\end{alignedat}
+\end{align}
+
+\subsubsection{Bound on the excess risk}
+Plugging the bounds on $\calA(\lambda,f^*)$ and $\calN_{K_G}(\lambda)$ into \eqref{init_bound}, we have
+\begin{align}\label{second_bound}
+\begin{alignedat}{3}
+    E[\calR(\hat{f}_\lambda)]-\calR(f^*) & \le \frac{24}{n^2}\|f^*\|_{L^\infty}+16\lambda^{2r}\|g\|_{L^2}^2\\
+    &+ \frac{16\sigma^2_\rho}{n}\lambda \left(\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle) + C_{\calM/\langle G\rangle}\right) \\
+    &+ \frac{16\sigma^2_\rho}{n}\frac{s}{2s-d}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\lambda^{1-\frac{1}{s}(s+d/2)}\\
+    &+\frac{16\sigma^2_\rho}{n}\frac{s}{2s-d+1}C_{\calM/\langle G\rangle}\lambda^{1-\frac{1}{s}(s+(d-1)/2)}
+\end{alignedat}
+\end{align}
+Next, we minimize the sum of the second and forth term in \eqref{second_bound} in terms of $\lambda$, i.e. minimizing 
+\begin{align}\label{p_lambda}
+    p(\lambda) = (16\|g\|_{L^2}^2)\lambda^{2r} + \left(\frac{16\sigma^2_\rho}{n}\frac{s}{2s-d}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)\lambda^{1-\frac{1}{s}(s+d/2)}
+\end{align}
+To do this, we use the following result. Consider the function
+\begin{align}
+    p(t) = c_at^{-a}+c_bt^{b}
+\end{align}
+where $c_a,c_b,a,b>0$ and $p(0)=p(\infty)=\infty$. Then $p(t)$ is minimized at $t= \left(\frac{ac_a}{bc_b}\right)^{1/(a+b)}$. Apply this to the function in \eqref{p_lambda}, we get that $p(\lambda)$ is minimized when
+\begin{align}\label{lam}
+    \lambda = \left(\frac{d\sigma^2_\rho}{4r\|g\|_{L^2}^2(2s-d)n}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)^{s/(2rs+d/2)}
+\end{align}
+Plugging the $\lambda$ in \eqref{lam} into \eqref{second_bound} and rewriting non-dominating terms as an exponent of $n$ times a constant give us
+\begin{align}
+    E[\calR(\hat{f}_\lambda)]-\calR(f^*) 
+    & \le 32\left(\frac{d\sigma^2_\rho}{4r\|g\|_{L^2}^2(2s-d)n}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)^{2rs/(2rs+d/2)}\|g\|_{L^2}^2\\
+    &+ C_1n^{-1-(2rs+1/2)/(2rs+d/2)} + C_2n^{-1-s/(2rs+d/2)} + C_3n^{-2}\\
+    &= 32\left(\frac{d\sigma^2_\rho}{4r(2s-d)n}\frac{\omega_d}{(2\pi)^d}vol(\calM/\langle G\rangle)\right)^{2rs/(2rs+d/2)}\|g\|_{L^2}^{d/(2rs+d/2)}\\
+    &+ o\left(n^{-2rs/(2rs+d/2)}\right)
+\end{align}
+where $C_{1:3}>0$ are constants not depending on $n$. This concludes the proof for Theorem \ref{theo_bound}.
+
+\subsection{Discussion}
+In this project, I have provided a generalization bound on the excess risk for geometrically stable targets. Noticeably, the rate of convergence in Theorem \ref{theo_bound} is very similar to that of \cite{tahmasebi2023exact} with the quotient group being defined based on $\langle G \rangle$ instead of $G$ itself. This difference is reasonable since we should expect a decrease in learning rate for not being exactly invariant. In addition, the multiplier of $s$ in the exponent is $2r>1$ instead of $\theta\in (0,1]$, making the exponent larger overall. This is interesting since it seems to imply that the source condition gives better exponent term than the additional Sobolev condition ($f^*\in \calH_{\theta s}(\calM)$) found in \cite{tahmasebi2023exact}. \\
+The challenge for this bound, however, is how to quantify the volume $vol(\calM/\langle G\rangle)$ and the dimension $d$ of the quotient space. Another problem is that if the Haar measure of $G$ were zero, it would cause the kernel $S_G$ to be zero, making the definition in \eqref{S_G} useless. A future direction can be trying to replace the assumption of $\langle G\rangle$ existing to a group $Q$ such that $K_Q-K_G$ is a positive definite kernel. 

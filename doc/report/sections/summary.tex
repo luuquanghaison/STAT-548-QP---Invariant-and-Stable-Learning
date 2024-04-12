@@ -1,0 +1,192 @@
+% !TEX root = ../main.tex
+
+% Summary section
+
+\section{Summary}\label{section1}
+\subsection{Technical summary and analysis}
+\subsubsection{Set up}
+$\bullet$ \textbf{Statistical learning and Kernel ridge regression (KRR):} Consider the supervised learning problem where the data are pairs of input-label $(x_i,y_i)^n_{i=1}$ satisfying
+\begin{align}
+\begin{alignedat}{3}
+\forall\ i\in \{1,\ldots,n\}:
+\begin{cases}
+&x_i\in \calX:=\bbS^{d-1}\subset\bbR, y_i\in \bbR\\
+&(x_i,y_i)\sim \rho\\
+&E(y_i|x_i) = f^*(x_i),\ f^*:\bbS^{d-1}\to \bbR,\ f^*\in L^2(\bbS^{d-1})    
+\end{cases}
+\end{alignedat}
+\end{align}
+where $\bbS^{d-1}$ is the unit sphere in $d$ dimension, $f^*$ is the target function, $L^2(\bbS^{d-1})$ is the space of square-integrable real-valued functions on $\bbS^{d-1}$ and $\rho$ is a distribution with the marginal for the input component being the uniform distribution on $\bbS^{d-1}$. Denote $d\tau$ the uniform measure on $\bbS^{d-1}$ and write $L^2(\bbS^{d-1})$ as $L^2(d\tau)$ or $L^2$ for simplicity. Our goal is to obtain generalization bounds as a function of the sample size $n$ on the excess risk
+\begin{align}
+    E[R(\hat{f}_n)] - R(f^*) = E[\|\hat{f}_n-f^*\|^2_{L^2}]
+\end{align}
+where $\hat{f}_n$ is the estimator based on the data, $\|\cdot\|_{L^2}$ is the $L^2$ norm, the expectation is over the n samples and the $L^2$ risk $R$ is defined as
+\begin{align}
+    R(f):=E_{(x,y)\sim\rho}[(f(x)-y)^2].
+\end{align}
+In \cite{bietti2021sample}, the authors consider the KRR estimator
+\begin{align}
+    \hat{f}_\lambda := \arg\min_{f\in \calH_K}\frac{1}{n}\sum_{i=1}^n(f(x_i)-y_i)^2 + \lambda\|f\|_{\calH_K}^2
+\end{align}
+where $\lambda>0$, $K(x,x'):=\kappa(\langle x,x'\rangle)$ is a dot-product kernel and $\calH_K$ is the associated reproducible kernel Hilbert space (RKHS).\\
+$\bullet$ \textbf{Harmonic analysis on the sphere:} For any $f\in L^2$, we can decompose it in the spherical harmonic polynomial basis $\{Y_{k,j}:k\ge0,j=1,\ldots,N(d,k)\}$ of $L^2$ as follows
+\begin{align}
+    f(x) = \sum_{k\ge 0}\sum_{j=1}^{N(d,k)}a_{k,j}Y_{k,j}(x)
+\end{align}
+where $a_{k,j}\in \bbR, \sum_k\sum_{j=1}^{N(d,k)}a_{k,j}^2<\infty$ and for each $k$, 
+the collection $\{Y_{k,j}\}_{j=1}^{N(d,k)}$ form an orthonormal basis of the space $V_{d,k}$ of degree $k$ spherical harmonics. Using the same basis, any positive definite dot-product kernel $K$ can be written as
+\begin{align}
+    K(x,x') = \sum_{k\ge 0}\mu_k\sum_{j=1}^{N(d,k)}Y_{k,j}(x)Y_{k,j}(x')
+\end{align}
+where $\{\mu_k\}_{k\ge0}$ are the eigenvalues of the following operator
+\begin{align}
+    T_Kf(x) := \int K(x,x')f(x')d\tau(x').
+\end{align}
+Investigating the decays of $\mu_k$ is crucial to obtaining bounds on the excess risk.\\
+$\bullet$ \textbf{Group invariant and geometrically stable functions:} Consider a finite set $G$ of transformations $\sigma:\calX\to\calX$. Define the smoothing operator $S_G$ as follows
+\begin{itemize}
+    \item If $G$ is a group
+    \begin{align}
+        S_Gf(x) := \frac{1}{|G|}\sum_{\sigma\in G}f(\sigma\cdot x)
+    \end{align}
+    where $\sigma\cdot x := \sigma(x)$ and $|G|$ is the size of $G$.
+    \item If $G$ is not a group
+    \begin{align}
+        S_Gf(x) := \sum_{\sigma\in G}h(\sigma)f(\sigma\cdot x)
+    \end{align}
+    where $h(\sigma)\ge0$ for all $\sigma\in G$ and $\sum_{\sigma\in G}h(\sigma)=1$. In what follows, assume that $G$ is symmetric, i.e. $\sigma^{-1}\in G$ if $\sigma\in G$ and $h(\sigma)=h(\sigma^{-1})$ so that $S_G$ is self-adjoint.
+\end{itemize}
+\begin{definition}
+    Let $G$ be defined as above
+    \begin{itemize}
+        \item If $G$ is a group, a function $f$ is $G$-invariant if
+    \begin{align}
+        f(\sigma\cdot x) = f(x)\quad \forall\ \sigma\in G,x\in \calX
+    \end{align}
+        \item A function $f$ is geometrically stable if
+    \begin{align}
+        \exists\ g\in L^2:f(x) = S_Gg(x)\quad \forall\ x\in \calX
+    \end{align}
+    \end{itemize}
+    Note that invariance implies geometric stability since $f = S_Gf$ for any $G$-invariant function.
+\end{definition}
+
+\subsubsection{Bounds for invariant target}
+For a $G$-invariant target $f^*$, the authors derive bounds for KRR estimators using a generic dot-product kernel $K$ and its smoothed version
+\begin{align}
+    K_G(x,x') := S_GK(x,x') = \frac{1}{|G|}\sum_{\sigma\in G}K(\sigma\cdot x,x')
+\end{align}
+In addition, denote $\Bar{V}_{d,k}:=S_G V_{d,k}$ and its basis of invariant spherical harmonics $\{\Bar{Y}_{k,j}\}_{j=1}^{\Bar{N}(d,k)}$. Then we have the following lemma
+\begin{lemma}
+    For any $k\ge 0$, we have
+    \begin{align}
+        \gamma_d(k):=\frac{\Bar{N}(d,k)}{N(d,k)}=\frac{1}{|G|}\sum_{\sigma\in G}E_x[P_{d,k}(\langle \sigma\cdot x,x'\rangle)]
+    \end{align}
+    where $P_{d,k}$ are Legendre polynomials of degree $k$ in $d$ dimensions (normalized with $P_{d,k}(1)=1$).
+\end{lemma}
+The quantity $\gamma_d(k)$ will determine the gain in sample complexity due to invariance. In this setting, the following assumptions are made
+\begin{enumerate}
+    \item[(A1)] (capacity condition): $\calN_K(\lambda)\le C_K\lambda^{-1/\alpha}$ with $\alpha >1, C_K>0$.\\
+Here the degrees of freedom $\calN_K(\lambda)$ is defined as
+\begin{align}\label{def_N}
+    \calN_K(\lambda) := Tr(\Sigma_K(\Sigma_K+\lambda I)^{-1}) = \sum_{m\ge 0} \frac{\lambda_m}{\lambda_m+\lambda}
+\end{align}
+where $\Sigma_K:= E_x[K(x,\cdot)\bigotimes_{\calH_K}K(x,\cdot)]$ is the covariance operator $(\lambda_m)_{m\ge0}$ its eigenvalues, taking multiplicity into account, which are the same as those of $T_K$ when data is distributed according to $d\tau$. 
+    \item[(A2)] (source condition): $\exists\ r>\frac{\alpha-1}{2\alpha}, g\in L^2, \|g\|_{L^2}\le C_{f^*}:f^*= T^r_Kg$ where
+    \begin{align}
+        T_K^rg := \sum_{k\ge 0}\mu_k^r\sum_{j=1}^{N(d,k)}a_{k,j}Y_{k,j}
+    \end{align}
+    with $g = \sum_{k\ge 0}\sum_{j=1}^{N(d,k)}a_{k,j}Y_{k,j}$.
+    \item[(A3)] (invariance): $f^*$ is $G$-invariant
+    \item[(A4)] (problem noise): $\rho$ is such that $E_\rho[(y-f^*(x))^2|x]\le \sigma^2_\rho$
+\end{enumerate}
+The generalization bounds for invariant targets are as follow
+\begin{theorem}\label{theo1}
+    Assume (A1-4). Let $\nu_d(l):= \sup_{k\ge l}\gamma_d(k)$ and assume $\nu_0>0$.\\
+    Let $n> \max\{\|f^*\|^2_\infty/\sigma^2_p,(C_1/\nu_0)^{\frac{\alpha}{2\alpha r +1-\alpha}}\}$ and define
+    \begin{align}
+        l_n:=\sup\{l:D(l)<C_2\nu_d(l)^{\frac{2\alpha r}{2\alpha r +1}}n^{\frac{1}{2\alpha r +1}}\}
+    \end{align}
+    where $D(l)=\sum_{k<l}\Bar{N}(d,k)$.\\
+    Using KRR with kernel $K_G$, we have, for $\lambda=C_3(\nu_d(l_n)/n)^{\frac{\alpha}{2\alpha r +1}}$,
+    \begin{align}
+        E[R(\hat{f}_\lambda)]-R(f^*)\le C_4\left(\frac{\nu_d(l_n)}{n}\right)^{\frac{2\alpha r}{2\alpha r +1}}
+    \end{align}
+    Using KRR with kernel $K$, we have, for $\lambda=C_3n^{\frac{-\alpha}{2\alpha r +1}}$,
+    \begin{align}
+        E[R(\hat{f}_\lambda)]-R(f^*)\le C_4\left(\frac{1}{n}\right)^{\frac{2\alpha r}{2\alpha r +1}}
+    \end{align}
+    Here the constants $C_{1:4}$ only depend on the parameters of assumptions (A1-4).
+\end{theorem}
+Since $\nu_d(l_n)\le 1$, there will always be some improvement in sample complexity when using $K_G$ as opposed to $K$. In addition, the paper shows that the rate $\frac{\nu_d(l_n)}{n}$ is asymptotically $\frac{1}{|G|n}$, which is asymptotically minimax optimal.
+
+\subsection{Bounds for geometrically stable target}
+For a geometrically stable target $f^*$, the smoothed kernel $K_G$ is redefined as
+\begin{align}
+    K_G(x,x') := S_GK(x,x') = \sum_{\sigma\in G}h(\sigma)K(\sigma\cdot x,x')
+\end{align}
+Next, we have the following lemma
+\begin{lemma}
+    There exists a basis of spherical harmonics $\Bar{Y}_{k,j}$, for $k \ge 0$, and $j = 1,\ldots, N(d, k)$, in which the operator $S_G$ is diagonal, with eigenvalues $\lambda_{k,j}\ge0$. In addition, we have
+    \begin{align}
+        \gamma_d(k):=N(d,k)^{-1}\sum_{j=1}^{N(d,k)}\lambda_{k,j}=\sum_{\sigma\in G}h(\sigma)E_x[P_{d,k}(\langle \sigma\cdot x,x'\rangle)]
+    \end{align}
+\end{lemma}
+In this setting, assumptions (A1-3) is replaced by 
+\begin{enumerate}
+    \item[(A5)] (capacity condition): the eigenvalues $(\xi_m)_{m\ge0}$ of $T_K$ satisfy $\xi_m \le C(m + 1)^{-\alpha}$ where $\alpha>1$.
+    \item[(A6)] (source condition): $\exists\ r>\frac{\alpha-1}{2\alpha}, g\in L^2, \|g\|_{L^2}\le C_{f^*}:f^*= S_G^rT^r_Kg$.
+\end{enumerate}
+Note that assumption (A6) is the same as a standard source condition for $K_G$ since $T_{K_G}=S_GT_K$. With this, the generalization bounds for geometrically stable targets are as follow
+\begin{theorem}\label{theo2}
+    Assume (A4-6). Let $\nu_d(l):= \sup_{k\ge l}\gamma_d(k)$ and assume $\nu_0>0$.\\
+    Let $n> \max\{\|f^*\|^2_\infty/\sigma^2_p,(C_1/\nu_0)^{\frac{1}{2\alpha r +1-\alpha}}\}$ and define
+    \begin{align}
+        l_n:=\sup\{l:D(l)<C_2\nu_d(l)^{\frac{2 r}{2\alpha r +1}}n^{\frac{1}{2\alpha r +1}}\}
+    \end{align}
+    where $D(l)=\sum_{k<l}\Bar{N}(d,k)$.\\
+    Using KRR with kernel $K_G$, we have, for $\lambda=C_3(\nu_d(l_n)^{1/\alpha}/n)^{\frac{\alpha}{2\alpha r +1}}$,
+    \begin{align}
+        E[R(\hat{f}_\lambda)]-R(f^*)\le C_4\left(\frac{\nu_d(l_n)^{1/\alpha}}{n}\right)^{\frac{2\alpha r}{2\alpha r +1}}.
+    \end{align}
+    Using KRR with kernel $K$, we have the same bound with $\nu_d(l_n)$ replaced by 1, but with a possibly smaller constant $C_4$. Here the constants $C_{1:4}$ only depend on the parameters of assumptions (A4-6).
+\end{theorem}
+The bounds here are essentially the same as in Theorem \ref{theo1} with $\nu_d(l_n)$ replaced by its new definition and an added $1/\alpha$ exponential reducing the improvement to sample complexity.
+
+\subsubsection{Proof techniques}
+The proof techniques for both the inivariant and geometrically stable cases follow a similar path. First, by Proposition 7.2 from \cite{bach2021learning}, we have, for $\lambda\le 1$, assuming $K_G(x, x) \le 1$ almost surely and $n \ge \frac{5}{\lambda}(1 + \log(1/\lambda))$,
+\begin{align}
+    E[R(\hat{f}_\lambda)]-R(f^*)\le 16\calA_{\calH_{K_G}}(\lambda,f^*) + 16\frac{\sigma^2_\rho}{n}\calN_{K_G}(\lambda)+\frac{24}{n^2}\|f^*\|^2_\infty
+\end{align}
+where the degrees of freedom $\calN_{K_G}(\lambda)$ is defined as in assumption (A1) and the approximation error $\calA_{\calH_{K_G}}(\lambda,f^*)$ is defined as
+\begin{align}
+    \calA_{\calH_{K_G}}(\lambda,f^*) := \inf_{f\in \calH_{K_G}}\|f-f^*\|^2_{L^2}+\lambda\|f\|_{\calH_{K_G}}
+\end{align}
+Next, $\calA_{\calH_{K_G}}(\lambda,f^*)$ is bounded by a function of $\lambda$ and $\calN_{K_G}(\lambda)$ is bounded by a function of $\lambda$ and $l$. Specifically, the bound for $\calA_{\calH_{K_G}}(\lambda,f^*)$ uses the fact that $\calA_{\calH_{K_G}}(\lambda,f^*)=\calO(\calA_{\calH_{K}}(\lambda,f^*))$ (Lemma 3 of \cite{bietti2021sample}), a bound on $\calA_{\calH_{K}}(\lambda,f^*)$ (Theorem 3, p.33 of \cite{cucker2002mathematical}) and the source condition. The bound on $\calN_{K_G}(\lambda)$ relies on the capacity condition and the expression the expression in \eqref{def_N}. Then the sum of these bounds is bounded by choosing the appropriate $\lambda=\lambda_n$. In short, the process can be expressed as follows
+\begin{align*}
+    E[R(\hat{f}_\lambda)]-R(f^*)&\le 16\calA_{\calH_{K_G}}(\lambda,f^*) + 16\frac{\sigma^2_\rho}{n}\calN_{K_G}(\lambda)+\frac{24}{n^2}\|f^*\|^2_\infty\\
+    &\le F_1(\lambda) + 16\frac{\sigma^2_\rho}{n}F_2(\lambda,l) + \frac{24}{n^2}\|f^*\|^2_\infty\\
+    &\le F_1(\lambda_n) + 16\frac{\sigma^2_\rho}{n}\underbrace{\qquad F_2(\lambda_n,l)\qquad} + \frac{24}{n^2}\|f^*\|^2_\infty\\
+    &= \underbrace{F_1(\lambda_n) + 16\frac{\sigma^2_\rho}{n}[G_1(\lambda_n,l)} + G_2(l)] + \frac{24}{n^2}\|f^*\|^2_\infty\\
+    &=\quad\qquad F_3(\lambda_n,l,n) \quad\qquad + 16\frac{\sigma^2_\rho}{n}G_2(l) + \frac{24}{n^2}\|f^*\|^2_\infty
+\end{align*}
+where $F_1,F_2$ are functions corresponding to the bounds on $\calA_{\calH_{K_G}}(\lambda,f^*),\calN_{K_G}(\lambda)$ and $F_3(\lambda_n,l,n)$ have the same form as the bounds in the main results. Finally, conditions are imposed on $l$ and $n$ to ensure $G_2(l,n)$ and $\frac{24}{n^2}\|f^*\|^2_\infty$ are smaller than $F_3(\lambda_n,l)$.\\
+
+
+\subsubsection{Discussion}
+Overall, the generalization bounds on the excess risk is obtained by decomposing it into the approximation error, degrees of freedom and an additional error then bound each of these terms. All assumptions are either made by previous works (capacity and source conditions) or made to achieve the desired bound without much deeper meaning (conditions for $l,n$ and $\lambda$). The main challenge is that the exponent of the sample complexity rate is of order $1/d$ the target is Lipschitz, which is not optimal.\\
+The paper's results can be generalized to infinite groups since the finite group argument is only used to defined the smoothing operator $S_G$. We can change this definition to accommodate infinite groups as follows
+\begin{align}
+    S_Gf(x) := \int f(\sigma\cdot x)d\mu_G(\sigma)
+\end{align}
+where $\mu_G$ is the left-invariant Haar (uniform) measure of $G$. In addition, the input space can be changed from the unit sphere $\bbS^{d-1}$ to some kind of compact manifold. In this setting, the spherical harmonic basis can be changed to a more general basis and $\gamma_d(k)$ can monitor the change in dimension of the subspaces after projecting to the space of $G$-invariant functions. 
+
+\subsection{Conceptual summary}
+In supervised learning problems, it is often beneficial to utilize properties such as invariance or stability to certain groups of transformations. The paper studies the sample complexity of learning problems for target functions with these properties. The authors do this by examining spherical harmonic decompositions of such functions on the sphere. They show that the non-parametric rate of convergence for kernel methods improves by a factor equal to the size of the group asymptotically when an invariant kernel is used compare to a non-invariant kernel. These results also apply to geometrically stable targets but with a less significant improvement.
+\subsubsection{Relation to other works}
+The results of \cite{bietti2021sample} are based on three strategies: bounding the excess risk by the approximation error and estimation error using a bound in \cite{bach2021learning}, then bounding the approximation error using a bound in \cite{cucker2002mathematical} and the estimation error using a bound in \cite{mei2021learning}. The bound in \cite{mei2021learning} examines the fraction of invariant eigenfunctions and total eigenfunctions of each eigenspace in the spherical harmonic decomposition, is an effective way to establish the convergence rate for the generalization bound. \cite{bietti2021sample} also improves the convergence rate found in \cite{mei2021learning} in the sense that the improvement for invariant kernels in \cite{bietti2021sample} can be exponential in dimension while the rate improvement in \cite{mei2021learning} is only polynomial in dimension. However, in the class of groups consider by \cite{mei2021learning} (subsets of the orthogonal group $\calO(d)$), the improvement is minimax for the excess risk while the improvement in \cite{bietti2021sample} is only minimax for the rate of convergence on the generalization bound, which is a weaker optimality property. Note also that \cite{mei2021learning} considers the high-dimensional regime where $d\to\infty$ as $n\to\infty$ while \cite{bietti2021sample} considers $d$ to be fixed. For the input space, the paper considers the uniform distribution on the unit sphere and uses spherical harmonic decompositions, which are relatively restrictive. \cite{tahmasebi2023exact} generalizes this setting by considering a compact manifold input space and considers smooth compact Lie groups instead of finite groups. Their bounds improve upon the exponent of rate of convergence, which suffers from the curse of dimensionality in \cite{bietti2021sample}, and are minimax for the excess risk. \cite{elesedy2021provably} also studies benefits of group invariance, but focuses on linear models, and only considers interpolating estimators.
+
+\subsubsection{Contributions and impact}
+The task of finding the sample complexity for the generalization bound on the excess risk is a relatively well studied problem but studying the sample complexity benefit of incorporating prior information on invariance and stability is a relatively new problem. In addition, the paper focuses on kernel ridge regression in a fixed dimensional regime, which is a setting not yet considered for the addressed problem. For proving techniques, the paper mostly utilizes results and assumptions from previous works for the bounds on invariant targets. For geometrically stable target, there are some innovations such as formulating of the smoothing operator as a weighted sum instead of an average, and redefining key quantities and assumptions based on this new operator.\\
+The paper is technically sound overall. The results for invariant target is adequately supported by experiment. There are also optimality discussions for invariant target showing that it is the best result one can hope to achieve with current assumptions. The results for geometrically stable target, on the other hand, have no supporting experiments and little discussion on the tightness of the bounds. For clarity, the paper is well organized. However, some notations are not clearly defined such as taking power of an operator.\\
+The paper provides several contributions. The first is the minimax rate of convergence for the generalization bounds. It sets up the intuition that the improvement in rate can be as large as the "size" of the group and has inspired results for more general settings and groups \cite{tahmasebi2023exact}. This solidifies the benefits seen from leveraging invariance in kernel methods and hopefully can be extended to other learning methods as well. In addition, there are many properties that can be explored further for geometrically stable targets such as approximation-estimation trade-off or optimality. In practice, however, it is not clear how the paper's results can help in finding new, more effective learning methods.
